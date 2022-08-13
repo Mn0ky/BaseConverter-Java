@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class Main
 {
-    private static Map<Character, Integer> CharToHexMap = new HashMap<Character, Integer>() {{
+    private static final Map<Character, Integer> CharToHexMap = new HashMap<Character, Integer>() {{
         put('A', 10);
         put('B', 11);
         put('C', 12);
@@ -14,7 +14,7 @@ public class Main
         put('E', 14);
         put('G', 15);
     }};
-    private static Map<Integer, Character> HexToCharMap = new HashMap<Integer, Character>() {{
+    private static final Map<Integer, Character> HexToCharMap = new HashMap<Integer, Character>() {{
         put(10, 'A');
         put(11, 'B');
         put(12, 'C');
@@ -45,10 +45,10 @@ public class Main
         System.out.println("Enter the number to convert:");
         String numberToConvert = scanner.nextLine().toUpperCase(); // The original numerical value
 
-        System.out.println("Convert from:");
+        System.out.println("Convert from (binary, octal, decimal, or hex):");
         String baseTypeOriginalStr = scanner.nextLine().toUpperCase(); // The original base type (hex, octal, or etc.)
 
-        System.out.println("Convert to:");
+        System.out.println("Convert to (binary, octal, decimal, or hex):");
         String baseTypeNew = scanner.nextLine().toUpperCase(); // The new, wanted base type (hex, octal, or etc.)
 
         String finalNumber;
@@ -63,18 +63,18 @@ public class Main
 
         boolean usingHex = originalBase == 16 || newBase == 16; // Whether or not hex chars will be needed
 
-        if (originalBase == 10)
+        if (originalBase == 10) // Decimal to binary, octal, and hex
         {
-            finalNumber = ConvertFromDecimal(numberToConvert, newBase, usingHex); // Decimal to binary, octal, and hex
+            finalNumber = ConvertFromDecimal(numberToConvert, newBase, usingHex);
         }
-        else if ((originalBase == 8 && newBase == 16) || (originalBase == 16 && newBase == 8))
+        else if (newBase == 10) // Binary, octal, and hex to decimal
         {
-            finalNumber = ConvertToDecimal(numberToConvert, originalBase, true);
-            finalNumber = ConvertFromDecimal(finalNumber, newBase, true); // Use decimal as intermediary, convert to octal/hex
+            finalNumber = ConvertToDecimal(numberToConvert, originalBase, usingHex);
         }
-        else
+        else // Use decimal as intermediary, convert binary/octal/hex directly to hex/octal/binary
         {
-            finalNumber = ConvertToDecimal(numberToConvert, originalBase, usingHex); // Binary, octal, and hex to decimal
+            finalNumber = ConvertToDecimal(numberToConvert, originalBase, usingHex);
+            finalNumber = ConvertFromDecimal(finalNumber, newBase, usingHex);
         }
 
         System.out.println("Converted " + baseTypeOriginalStr + " to " + baseTypeNew + ": " + finalNumber);
