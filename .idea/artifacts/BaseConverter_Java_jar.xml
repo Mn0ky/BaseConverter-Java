@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="BaseConverter-Java:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/BaseConverter_Java_jar</output-path>
+    <root id="archive" name="BaseConverter-Java.jar">
+      <element id="module-output" name="BaseConverter-Java" />
+    </root>
+  </artifact>
+</component>

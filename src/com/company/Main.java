@@ -6,15 +6,15 @@ import java.util.Scanner;
 
 public class Main
 {
-    private static final Map<Character, Integer> CharToHexMap = new HashMap<Character, Integer>() {{
+    private static final Map<Character, Integer> CHAR_TO_HEX = new HashMap<Character, Integer>() {{
         put('A', 10);
         put('B', 11);
         put('C', 12);
         put('D', 13);
         put('E', 14);
-        put('G', 15);
+        put('F', 15);
     }};
-    private static final Map<Integer, Character> HexToCharMap = new HashMap<Integer, Character>() {{
+    private static final Map<Integer, Character> HEX_TO_CHAR = new HashMap<Integer, Character>() {{
         put(10, 'A');
         put(11, 'B');
         put(12, 'C');
@@ -30,7 +30,7 @@ public class Main
 
         while (continueProgram)
         {
-            RunConverter(scanner); // Main logic
+            runConverter(scanner); // Main logic
 
             System.out.println("\nContinue? Y/N");
             String continueValue = scanner.nextLine().toLowerCase();
@@ -40,7 +40,7 @@ public class Main
         }
     }
 
-    private static void RunConverter(Scanner scanner)
+    private static void runConverter(Scanner scanner)
     {
         System.out.println("Enter the number to convert:");
         String numberToConvert = scanner.nextLine().toUpperCase(); // The original numerical value
@@ -52,8 +52,8 @@ public class Main
         String baseTypeNew = scanner.nextLine().toUpperCase(); // The new, wanted base type (hex, octal, or etc.)
 
         String finalNumber;
-        int originalBase = GetBaseFromType(baseTypeOriginalStr);
-        int newBase = GetBaseFromType(baseTypeNew);
+        int originalBase = getBaseFromType(baseTypeOriginalStr);
+        int newBase = getBaseFromType(baseTypeNew);
 
         if (originalBase == Integer.MAX_VALUE || newBase == Integer.MAX_VALUE) // If invalid base specified, state that and exit
         {
@@ -61,27 +61,27 @@ public class Main
             System.exit(1);
         }
 
-        boolean usingHex = originalBase == 16 || newBase == 16; // Whether or not hex chars will be needed
+        boolean usingHex = originalBase == 16 || newBase == 16; // Whether hex chars will be needed
 
         if (originalBase == 10) // Decimal to binary, octal, and hex
         {
-            finalNumber = ConvertFromDecimal(numberToConvert, newBase, usingHex);
+            finalNumber = convertFromDecimal(numberToConvert, newBase, usingHex);
         }
         else if (newBase == 10) // Binary, octal, and hex to decimal
         {
-            finalNumber = ConvertToDecimal(numberToConvert, originalBase, usingHex);
+            finalNumber = convertToDecimal(numberToConvert, originalBase, usingHex);
         }
         else // Use decimal as intermediary, convert binary/octal/hex directly to hex/octal/binary
         {
-            finalNumber = ConvertToDecimal(numberToConvert, originalBase, usingHex);
-            finalNumber = ConvertFromDecimal(finalNumber, newBase, usingHex);
+            finalNumber = convertToDecimal(numberToConvert, originalBase, usingHex);
+            finalNumber = convertFromDecimal(finalNumber, newBase, usingHex);
         }
 
         System.out.println("Converted " + baseTypeOriginalStr + " to " + baseTypeNew + ": " + finalNumber);
     }
 
     // Multiply each digit by the originalBase^currentIndex and sum them up-- gives us the decimal value
-    private static String ConvertToDecimal(String numberToConvert, int originalBase, boolean usingHex)
+    private static String convertToDecimal(String numberToConvert, int originalBase, boolean usingHex)
     {
         long finalNumber = 0;
 
@@ -90,9 +90,9 @@ public class Main
             long multiplier = (long) Math.pow(originalBase, i); // Don't need a double's precision
             char digitChar = numberToConvert.charAt(numberToConvert.length() - i - 1);
 
-            if (usingHex && CharToHexMap.containsKey(digitChar)) // Check if char is HEX alphabetic value
+            if (usingHex && CHAR_TO_HEX.containsKey(digitChar)) // Check if char is HEX alphabetic value
             {
-                finalNumber += CharToHexMap.get(digitChar) * multiplier; // Parse digit (hex letter) then multiply
+                finalNumber += CHAR_TO_HEX.get(digitChar) * multiplier; // Parse digit (hex letter) then multiply
                 continue;
             }
 
@@ -102,33 +102,36 @@ public class Main
         return Long.toString(finalNumber); // The final decimal value
     }
 
-    // Set decimal value as quotient, continuously divide by wanted base until it reaches 0. Each new digit is the remainder of an operation
-    private static String ConvertFromDecimal(String numberToConvert, int newBase, boolean usingHex)
+    /*
+    Set decimal value as quotient, continuously divide by wanted base until it reaches 0.
+    Each new digit is the remainder of an operation
+    */
+    private static String convertFromDecimal(String numberToConvert, int newBase, boolean usingHex)
     {
-        String finalNumber = " ";
+        String finalNumber = " "; // Have 1 filler character so first string insertion works
         long quotient = Long.parseLong(numberToConvert);
 
         while (quotient != 0)
         {
             int newDigit = (int) (quotient % newBase); // A new digit, it's the remainder of the operation
 
-            if (usingHex && HexToCharMap.containsKey(newDigit)) // Check if number is alphabetic HEX value
+            if (usingHex && HEX_TO_CHAR.containsKey(newDigit)) // Check if number is alphabetic HEX value
             {
-                String newHexCharDigit = HexToCharMap.get(newDigit).toString(); // Get HEX char from number
+                String newHexCharDigit = HEX_TO_CHAR.get(newDigit).toString(); // Get HEX char from number
 
-                finalNumber = StringInsert(finalNumber, newHexCharDigit, 0);
+                finalNumber = stringInsert(finalNumber, newHexCharDigit, 0);
                 quotient = quotient / newBase; // Set new, lower quotient
                 continue;
             }
 
-            finalNumber = StringInsert(finalNumber, Integer.toString(newDigit), 0);
+            finalNumber = stringInsert(finalNumber, Integer.toString(newDigit), 0);
             quotient = quotient / newBase; // Set new, lower quotient
         }
 
         return finalNumber.trim(); // The final value, remove's initial space character
     }
 
-    private static int GetBaseFromType(String originalType)
+    private static int getBaseFromType(String originalType)
     {
         switch (originalType)
         {
@@ -146,7 +149,7 @@ public class Main
     }
 
     // Inserts one string into another at target index
-    public static String StringInsert(String string1, String string2, int index)
+    public static String stringInsert(String string1, String string2, int index)
     {
         return string1.substring(0, index + 1) + string2 + string1.substring(index + 1);
     }
